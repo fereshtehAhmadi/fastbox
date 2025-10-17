@@ -1,5 +1,7 @@
-from fastapi import FastAPI, Query, status
+from fastapi import FastAPI, Query, status, Request
 from pydantic import BaseModel, Field
+from starlette.responses import HTMLResponse
+from starlette.templating import Jinja2Templates
 
 app = FastAPI(title="FastBox Demo API", version="1.0.0")
 
@@ -88,3 +90,32 @@ def create_user(user: UserInput):
     This demonstrates how to separate input and output models for cleaner and safer API design.
     """
     return user
+
+
+template = Jinja2Templates(directory="templates")
+
+
+@app.get("/welcome/template/{name}", response_class=HTMLResponse)
+def welcome(request: Request, name: str):
+    """
+    Endpoint to render a welcome page using a Jinja2 template.
+
+    Path Parameter:
+    - name: The name of the user to greet, passed in the URL path.
+
+    Context:
+    - The `context` dictionary is used to pass data into the template.
+    - The `request` object is required by Jinja2Templates for template rendering.
+
+    Returns:
+    - HTML response rendered from 'welcome.html' with the user's name.
+
+    Example:
+    GET /welcome/template/Fereshteh
+    """
+
+    return template.TemplateResponse(
+        request=request,
+        name="welcome.html",
+        context={"name": name}
+    )
