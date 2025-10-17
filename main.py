@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Query, status
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="FastBox Demo API", version="1.0.0")
@@ -77,7 +77,7 @@ class UserOutPut(BaseModel):
     phone_number: str
 
 
-@app.post("/create/user/", response_model=UserOutPut)
+@app.post("/create/user/", response_model=UserOutPut, status_code=status.HTTP_201_CREATED)
 def create_user(user: UserInput):
     """
     Endpoint to create a new user.
