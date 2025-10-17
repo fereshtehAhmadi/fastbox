@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Path, Query
+from pydantic import BaseModel, Field
 
 app = FastAPI(title="FastBox Demo API", version="1.0.0")
 
@@ -38,3 +39,25 @@ def get_product_details(product_name: str, price: float = 99.9):
         "price": price,
         "message": f"The product '{product_name}' costs ${price}.",
     }
+
+
+class Item(BaseModel):
+    """
+    Pydantic model defining the structure and validation rules
+    for a book item in the API request body.
+    """
+    name: str
+    author: str = Path(max_length=500, min_length=5)
+    price: int
+    number: int | None = Field(default=1, ge=1)
+
+
+@app.post("/create/book/")
+def create_book(item: Item, creator: str = Query(default="staff")):
+    """
+    Example endpoint demonstrating:
+    - Request body validation using a Pydantic model (`Item`)
+    - Query parameter with a default value (`creator`)
+    - Use of `model_dump()` to serialize model data into a dictionary
+    """
+    return {"creator": creator, **item.model_dump()}
