@@ -1,3 +1,2 @@
 fastapi[standard]
 sqlmodel
-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
