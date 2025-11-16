@@ -19,6 +19,8 @@ Alembic is a database migration tool for SQLAlchemy. Use the following commands 
 # Initialize Alembic in your project
 alembic init migrations
 
+# Create a new migration file by detecting changes in your models
+alembic revision --autogenerate -m "add user model"
 
 # Apply all migrations up to the latest version
 alembic upgrade head
