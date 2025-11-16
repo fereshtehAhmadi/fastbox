@@ -28,3 +28,8 @@ alembic upgrade head
 # Revert all migrations back to the initial state
 alembic downgrade base
 ```
+
+## run project
+```
+python main.py
+```
