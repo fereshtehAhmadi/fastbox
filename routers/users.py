@@ -3,7 +3,7 @@ from sqlmodel import select, or_
 
 from dependencies import SessionDep
 from models.users import Users
-from schema.users import UserOutPut, UserInput
+from schema.users import UserOutPut, UserInput, UserUpdate
 
 router = APIRouter()
 
@@ -33,7 +33,7 @@ def user_list(session: SessionDep) -> list[Users]:
     return users
 
 
-@router.get("/user/get", response_model=UserOutPut)
+@router.get("/user/get/{user_id}", response_model=UserOutPut)
 def get_user(user_id: int, session: SessionDep) -> UserOutPut:
     user = session.get(Users, user_id)
     if not user:
@@ -42,7 +42,7 @@ def get_user(user_id: int, session: SessionDep) -> UserOutPut:
     return user
 
 
-@router.delete("/user/delete")
+@router.delete("/user/delete/{user_id}")
 def delete_user(user_id: int, session: SessionDep) -> str:
     user = session.get(Users, user_id)
     if not user:
@@ -50,4 +50,17 @@ def delete_user(user_id: int, session: SessionDep) -> str:
 
     session.delete(user)
     session.commit()
+    return "OK"
+
+@router.patch("/user/update/{user_id}")
+def update_user(user_id: int, user: UserUpdate, session: SessionDep) -> str:
+    user_instance = session.get(Users, user_id)
+    if not user_instance:
+        raise HTTPException(detail="user not found", status_code=400)
+
+    user_data = user.model_dump(exclude_unset=True)
+    user_instance.sqlmodel_update(user_data)
+    session.add(user_instance)
+    session.commit()
+    session.refresh(user_instance)
     return "OK"

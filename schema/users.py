@@ -13,3 +13,9 @@ class UserInput(UserBase):
 
 class UserOutPut(UserBase):
     id: int
+
+
+class UserUpdate(BaseModel):
+    username: str | None = None
+    phone_number: str | None = None
+    email: str | None = None
