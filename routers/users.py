@@ -1,18 +1,29 @@
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select
+from sqlmodel import select, or_
 
 from dependencies import SessionDep
 from models.users import Users
-from schema.users import UserOutPut
+from schema.users import UserOutPut, UserInput
 
 router = APIRouter()
 
 
 @router.post("/user/create")
-def create_user(user: Users, session: SessionDep) -> str:
-    session.add(user)
+def create_user(user: UserInput, session: SessionDep) -> str:
+    valid_user = Users.model_validate(user)
+    email_user = session.exec(select(Users).where(
+        or_(
+                Users.email == user.email,
+                Users.username == user.username,
+        )
+    )
+    ).first()
+    if email_user:
+        raise HTTPException(detail="email and username must be unique!", status_code=400)
+
+    session.add(valid_user)
     session.commit()
-    session.refresh(user)
+    session.refresh(valid_user)
     return "OK"
 
 
